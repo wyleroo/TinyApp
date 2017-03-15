@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+</head>
+<body>
+  <h1><% "/_header.ejs" %></h1>
+  <%= link + ' ' + shortURL %>
+  <form action="/urls/<%=shortURL%>/update" method="POST">
+    <p>
+      <label for="newHash">Enter new shortURL</label>
+      <input id="newHash" type="string" name="newHash">
+      <input type="submit" value="Submit">
+
+   <!--    <button>Yeah change it up</button> -->
+    </p>
+  </form>
+</body>
+</html>
