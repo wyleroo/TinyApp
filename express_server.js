@@ -15,6 +15,25 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+// Sample user database
+var users = {
+  "wiley": {
+    id: "wiley",
+    email: "thewyatt@gmail.com",
+    password: "coffee"
+  },
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+}
+
 // Random string generator - to be set as randomShorty
 function generateRandomString() {
   var output = '';
@@ -28,8 +47,24 @@ function generateRandomString() {
 //Post login; redirect to index
 app.post("/login", (req, res) => {
   res.cookie('username', req.body.username);
-  console.log(req.cookies);
+  // console.log(req.cookies);
   res.redirect("/urls");
+});
+
+// Registration page
+app.get("/register", (req, res) => {
+  res.render("register");
+});
+
+// Registration handler
+app.post("/register", (req, res) => {
+  let randomID = generateRandomString();
+  let newUser = {id: randomID, email: req.body.email, password: req.body.password}
+  if (!users.[randomID].)
+  users[randomID] = newUser
+  res.cookie(req.body.email, randomID);
+  res.redirect("/urls")
+  // console.log(randomID, users[randomID]);
 });
 
 // Entry field for URL to shorten
