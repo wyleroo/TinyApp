@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-<head></head>
+<head>
+  <% include ../views/partials/_header.ejs %>
+</head>
 <body>
-    <h1><% "/_header.ejs" %></h1>
-    <% Object.keys(urls).forEach(function(key){ %>
-      <li><%= urls[key] + ' ' + [key] %>
-        <form method="POST" action="/urls/<%=key%>/delete">
-          <p>
-            <button>Delete</button>
-          </p>
-        </form>
-      </li>
-    <% }); %>
-    <a href="/urls/new">Enter new URL</a>
+  <% Object.keys(urls).forEach(function(key){ %>
+    <li><%= urls[key] + ' ' + [key] %>
+      <form method="POST" action="/urls/<%=key%>/delete">
+        <p>
+          <button>Delete</button>
+        </p>
+      </form>
+    </li>
+  <% }); %>
+  <a href="/urls/new">Enter new URL</a>
 </body>
 </html>
 
