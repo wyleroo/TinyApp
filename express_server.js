@@ -34,6 +34,16 @@ var users = {
   }
 }
 
+function emailChecker(emailIn) {
+  for (entry in users) {
+    var existing = false;
+    if (users[entry].email == emailIn) {
+      existing = true;
+    };
+  };
+  return existing;
+};
+
 // Random string generator - to be set as randomShorty
 function generateRandomString() {
   var output = '';
@@ -44,11 +54,19 @@ function generateRandomString() {
   return output;
 };
 
-//Post login; redirect to index
+//Login page
+app.get("/login", (req, res) => {
+  res.render("login");
+});
+
+//Login handler
 app.post("/login", (req, res) => {
-  res.cookie('username', req.body.username);
-  // console.log(req.cookies);
-  res.redirect("/urls");
+  if (!req.body.email || !req.body.password) {
+    res.status(400).send("You must fill out the things");
+  } else if () {
+    res.cookie("user_id", randomID);
+    res.redirect("/urls");
+  };
 });
 
 // Registration page
@@ -59,12 +77,14 @@ app.get("/register", (req, res) => {
 // Registration handler
 app.post("/register", (req, res) => {
   let randomID = generateRandomString();
-  let newUser = {id: randomID, email: req.body.email, password: req.body.password}
-  if (!users.[randomID].)
-  users[randomID] = newUser
-  res.cookie(req.body.email, randomID);
-  res.redirect("/urls")
-  // console.log(randomID, users[randomID]);
+  if (!req.body.email || !req.body.password || emailChecker(req.body.email)) {
+    res.status(400).send("Nah that ain't cool");
+  } else {
+    let newUser = {id: randomID, email: req.body.email, password: req.body.password};
+    users[randomID] = newUser;
+    res.cookie("user_id", randomID);
+    res.redirect("/urls");
+  };
 });
 
 // Entry field for URL to shorten
@@ -74,13 +94,14 @@ app.get("/urls/new", (req, res) => {
 
 // URLs index page
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase, username: req.cookies['username'] };
+  // Pass specified user object
+  let templateVars = { urls: urlDatabase, username: req.cookies.user_id };
   res.render("urls_index", templateVars);
 });
 
 // List of long and short URL based on short URL as id
 app.get("/urls/:id", (req, res) => {
-  let templateVars = { shortURL: req.params.id, link: urlDatabase[req.params.id], username: req.cookies['username'] };
+  let templateVars = { shortURL: req.params.id, link: urlDatabase[req.params.id], username: req.cookies.user_id };
   res.render("urls_show", templateVars);
 });
 

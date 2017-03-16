@@ -1,18 +1,6 @@
+<title>Wyatt's TinyApp</title>
 <font size="20" face="impact" color="goldenrod"> Wyatt's TinyApp </font>
-<% if (username) { %>
-    <br><font size="3" face="impact" color="seagreen"> currently logged in as <%= username %></font>
-    <form method="POST" action="/logout">
-        <p>
-          <button>Logout</button>
-        </p>
-      </form>
-  <% } else { %>
-    <form action="/login" method="POST">
-      <p>
-        <label for="username">Enter username</label>
-        <input id="username" type="string" name="username">
-        <input type="submit" value="Log In">
-      </p>
-    </form>
-  <% } %>
+<br>I mean you could at least <a href='/register'>Register</a> or <a href='/login'>Log In</a>
+
+
 
