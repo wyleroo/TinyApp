@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const cookieParser = require('cookie-parser');
 const bodyParser = require("body-parser");
+const bcrypt = require('bcrypt');
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser())
@@ -69,12 +70,9 @@ function urlsForUser(idRequest) {
   console.log('hello');
   for (key in urlDatabase) {
     console.log('there');
-    for (person in urlDatabase[key].userPermission) {
+    if (urlDatabase[key].userPermission == idRequest) {
       console.log('beautiful');
-      if (urlDatabase[key].userPermission[person] == idRequest) {
-        console.log(key);
-        urlUser[key] = urlDatabase.site;
-      }
+      urlUser[key] = urlDatabase[key].site;
     }
   }
   return urlUser;
@@ -136,7 +134,7 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls", (req, res) => {
   let permitted = urlsForUser(req.cookies.user_id);
   console.log('permitted', permitted);
-  let templateVars = { userPermisssion: permitted, urls: urlDatabase, user_id: req.cookies.user_id };
+  let templateVars = {urls: permitted, user_id: req.cookies.user_id };
   res.render("urls_index", templateVars);
 });
 
@@ -156,7 +154,7 @@ app.get("/u/:shortURL", (req, res) => {
 //Post request to handle new urls
 app.post("/urls", (req, res) => {
   let randomShorty = generateRandomString();
-  urlDatabase[randomShorty] = {randomShorty: {site: req.body.longURL, userPermission: req.cookies.user_id}};
+  urlDatabase[randomShorty] = {site: req.body.longURL, userPermission: req.cookies.user_id};
   console.log(urlDatabase);
   res.redirect(req.body.longURL);
 });

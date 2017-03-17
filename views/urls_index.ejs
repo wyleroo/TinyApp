@@ -6,7 +6,7 @@
 </head>
 <body>
   <% Object.keys(urls).forEach(function(key) { %>
-    <li><%= urls[key].site + ' ' + [key] %>
+    <li><%= urls[key] + ' ' + [key] %>
       <form method="POST" action="/urls/<%=key%>/delete">
         <p>
           <button>Delete</button>
