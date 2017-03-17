@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Wyatt's TinyApp</title>
-  <font size="20" face="impact" color="goldenrod"> Wyatt's TinyApp </font>
   <% include ../views/partials/_header.ejs %>
 </head>
 <body>
-  <%= link + ' ' + shortURL %>
+  <%= link.site + ' ' + shortURL %>
   <form action="/urls/<%=shortURL%>/update" method="POST">
     <p>
       <label for="newHash">Enter new shortURL</label>
