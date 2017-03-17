@@ -34,15 +34,35 @@ var users = {
   }
 }
 
-function emailChecker(emailIn) {
-  for (entry in users) {
-    var existing = false;
-    if (users[entry].email == emailIn) {
-      existing = true;
-    };
-  };
-  return existing;
-};
+// Function to verify email
+function emailSearch(emailIn) {
+  for (id in users) {
+    if (users[id].email == emailIn){
+      return true
+    }
+  }
+  return false
+}
+
+// FUnction to verify password
+function passwordSearch(passwordIn) {
+  for (id in users) {
+    if (users[id].password == passwordIn){
+      return true
+    }
+  }
+  return false
+}
+
+// Function to return user id based on email match
+function loginReturn(loginEmail) {
+  for (key in users) {
+    if (users[key].email == loginEmail){
+      return users[key].id;
+    }
+  }
+  return false
+}
 
 // Random string generator - to be set as randomShorty
 function generateRandomString() {
@@ -61,10 +81,10 @@ app.get("/login", (req, res) => {
 
 //Login handler
 app.post("/login", (req, res) => {
-  if (!req.body.email || !req.body.password) {
-    res.status(400).send("You must fill out the things");
-  } else if () {
-    res.cookie("user_id", randomID);
+  if (!req.body.email || !req.body.password || !passwordSearch(req.body.password)) {
+    res.status(403).send("Neg");
+  } else if (emailSearch(req.body.email) || passwordSearch(req.body.password)) {
+    res.cookie('user_id', loginReturn(req.body.email));
     res.redirect("/urls");
   };
 });
@@ -77,7 +97,7 @@ app.get("/register", (req, res) => {
 // Registration handler
 app.post("/register", (req, res) => {
   let randomID = generateRandomString();
-  if (!req.body.email || !req.body.password || emailChecker(req.body.email)) {
+  if (!req.body.email || !req.body.password || emailSearch(req.body.email)) {
     res.status(400).send("Nah that ain't cool");
   } else {
     let newUser = {id: randomID, email: req.body.email, password: req.body.password};
@@ -95,13 +115,13 @@ app.get("/urls/new", (req, res) => {
 // URLs index page
 app.get("/urls", (req, res) => {
   // Pass specified user object
-  let templateVars = { urls: urlDatabase, username: req.cookies.user_id };
+  let templateVars = { urls: urlDatabase, user_id: req.cookies.user_id };
   res.render("urls_index", templateVars);
 });
 
 // List of long and short URL based on short URL as id
 app.get("/urls/:id", (req, res) => {
-  let templateVars = { shortURL: req.params.id, link: urlDatabase[req.params.id], username: req.cookies.user_id };
+  let templateVars = { shortURL: req.params.id, link: urlDatabase[req.params.id], user_id: req.cookies.user_id };
   res.render("urls_show", templateVars);
 });
 
@@ -112,9 +132,9 @@ app.post("/urls", (req, res) => {
   res.redirect(req.body.longURL);
 });
 
-// Post request to delete cookies on logout
+// Logout and delete cookies
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect("/urls");
 });
 
