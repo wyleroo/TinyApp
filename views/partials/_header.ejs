@@ -1,7 +1,7 @@
 <title>Wyatt's TinyApp</title>
 <font size="20" face="impact" color="goldenrod"> Wyatt's TinyApp </font>
 <br>
-<% if (user_id) { %>
+<% if (locals.user_id) { %>
     <br><font size="3" face="impact" color="seagreen"> currently logged in as <%= user_id %></font>
     <form method="POST" action="/logout">
         <p>
