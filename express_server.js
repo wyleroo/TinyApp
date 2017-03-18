@@ -67,11 +67,8 @@ function loginReturn(loginEmail) {
 
 function urlsForUser(idRequest) {
   let urlUser = {};
-  console.log('hello');
   for (key in urlDatabase) {
-    console.log('there');
     if (urlDatabase[key].userPermission == idRequest) {
-      console.log('beautiful');
       urlUser[key] = urlDatabase[key].site;
     }
   }
@@ -95,9 +92,14 @@ app.get("/login", (req, res) => {
 
 //Login handler
 app.post("/login", (req, res) => {
-  if (!req.body.email || !req.body.password || !passwordSearch(req.body.password)) {
+  let typedWord = req.body.password;
+  let userHash = users[loginReturn(req.body.email)].password;
+  console.log(userHash, typedWord)
+  if (!req.body.email || !req.body.password) {
     res.status(403).send("Neg");
-  } else if (emailSearch(req.body.email) || passwordSearch(req.body.password)) {
+  } else if (bcrypt.compareSync(typedWord, userHash) == false) {
+    res.status(403).send("password be rong");
+  } else if (bcrypt.compareSync(typedWord, userHash) == true) {
     res.cookie('user_id', loginReturn(req.body.email));
     res.redirect("/urls");
   };
@@ -114,7 +116,8 @@ app.post("/register", (req, res) => {
   if (!req.body.email || !req.body.password || emailSearch(req.body.email)) {
     res.status(400).send("Nah that ain't cool");
   } else {
-    let newUser = {id: randomID, email: req.body.email, password: req.body.password};
+    let hashWord = bcrypt.hashSync(req.body.password, 10);
+    let newUser = {id: randomID, email: req.body.email, password: hashWord};
     users[randomID] = newUser;
     res.cookie("user_id", randomID);
     res.redirect("/urls");
