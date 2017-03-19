@@ -11,7 +11,7 @@ app.use(cookieSession({
   secret: 'mission',
 }))
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 
 // Sample database - could be replaced later with input fxn
 const urlDatabase = {
@@ -48,16 +48,6 @@ function emailSearch(emailIn) {
   return false
 }
 
-// FUnction to verify password
-function passwordSearch(passwordIn) {
-  for (id in users) {
-    if (users[id].password == passwordIn){
-      return true;
-    }
-  }
-  return false;
-}
-
 // Function to return user id based on email match
 function loginReturn(loginEmail) {
   for (key in users) {
@@ -68,6 +58,7 @@ function loginReturn(loginEmail) {
   return "";
 }
 
+// Function to filter URLDatabase for permitted sites
 function urlsForUser(idRequest) {
   let urlUser = {};
   for (key in urlDatabase) {
@@ -92,17 +83,14 @@ function generateRandomString() {
 app.get("/login", (req, res) => {
   res.render("login");
 });
-// var result = condition ? truevalue : falsevalue;
 
 //Login handler
 app.post("/login", (req, res) => {
   let typedWord = req.body.password;
   const user = users[loginReturn(req.body.email)];
   let userHash = user ? user.password : '';
-  console.log('login user_id', req.session.user_id);
-  console.log(userHash, typedWord)
   if (!req.body.email || !req.body.password) {
-    res.status(403).send("Neg");
+    res.status(403).send("Neg. Has to be valid email and password.");
   } else if (bcrypt.compareSync(typedWord, userHash) == false) {
     res.status(403).send("password be rong");
   } else if (bcrypt.compareSync(typedWord, userHash) == true) {
@@ -113,7 +101,6 @@ app.post("/login", (req, res) => {
 
 // Registration page
 app.get("/register", (req, res) => {
-  console.log('register user_id', req.session.user_id);
   let templateVars = {user_id: req.session.user_id };
   res.render("register", templateVars);
 });
@@ -121,7 +108,6 @@ app.get("/register", (req, res) => {
 // Registration handler
 app.post("/register", (req, res) => {
   let randomID = generateRandomString();
-  console.log('register user_id', req.session.user_id);
   if (!req.body.email || !req.body.password || emailSearch(req.body.email)) {
     res.status(400).send("Nah that ain't cool");
   } else {
@@ -135,7 +121,6 @@ app.post("/register", (req, res) => {
 
 // Entry field for URL to shorten
 app.get("/urls/new", (req, res) => {
-    console.log('new user_id', req.session.user_id);
   let templateVars = {user_id: req.session.user_id };
   if (req.session.user_id){
     res.render("urls_new", templateVars);
@@ -146,25 +131,34 @@ app.get("/urls/new", (req, res) => {
 
 // URLs index page
 app.get("/urls", (req, res) => {
-    console.log('index', req.session.user_id);
   let permitted = urlsForUser(req.session.user_id);
-  console.log('permitted', permitted,'session_id', req.session.user_id, urlDatabase);
   let templateVars = {urls: permitted, user_id: req.session.user_id };
-  res.render("urls_index", templateVars);
+  if (req.session.user_id) {
+      res.render("urls_index", templateVars);
+  } else {
+    res.redirect("login");
+  }
 });
 
 // List of long and short URL based on short URL as id
 app.get("/urls/:id", (req, res) => {
-  console.log(':id user_id', req.session.user_id);
+  let permitted = urlsForUser(req.session.user_id);
   let templateVars = { shortURL: req.params.id, link: urlDatabase[req.params.id], user_id: req.session.user_id };
-  res.render("urls_show", templateVars);
+  if (permitted[req.params.id]) {
+    res.render("urls_show", templateVars);
+  } else {
+    res.status(400).send("That shortURL does not yet exist.")
+  }
 });
 
 // Redirecting from shortURL to longURL
 app.get("/u/:shortURL", (req, res) => {
-  console.log('shortURL', req.session.user_id);
   let redirectURL = urlDatabase[req.params.shortURL].site;
-  res.redirect(redirectURL);
+  if (urlDatabase[req.params.shortURL]) {
+    res.redirect(redirectURL);
+  } else {
+    res.status(404).send("That shortURL does not yet exist.")
+  }
 });
 
 //Post request to handle new urls
