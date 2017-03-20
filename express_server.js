@@ -163,7 +163,6 @@ app.get("/u/:shortURL", (req, res) => {
 
 //Post request to handle new urls
 app.post("/urls", (req, res) => {
-  console.log('new urls', req.session.user_id);
   let randomShorty = generateRandomString();
   urlDatabase[randomShorty] = {site: req.body.longURL, userPermission: req.session.user_id};
   console.log(urlDatabase);
@@ -172,14 +171,12 @@ app.post("/urls", (req, res) => {
 
 // Logout and delete cookies
 app.post("/logout", (req, res) => {
-  console.log('logout', req.session.user_id);
   req.session = null;
   res.redirect("/urls");
 });
 
 // Post request to delete database entries
 app.post("/urls/:id/delete", (req, res) => {
-  console.log(':id/delete', req.session.user_id);
   if (req.session.user_id){
       delete urlDatabase[req.params.id];
         res.redirect("/urls");
@@ -190,8 +187,6 @@ app.post("/urls/:id/delete", (req, res) => {
 
 //Redirect and update database from Update button
 app.post("/urls/:id/update", (req, res) => {
-  console.log(req.session.user_id);
-  console.log('urlDatabase', urlDatabase);
   if (req.session.user_id == urlDatabase[req.params.id].userPermission) {
     urlDatabase[req.body.newHash] = urlDatabase[req.params.id];
     urlDatabase[req.body.newHash].userPermission = req.session.user_id;
