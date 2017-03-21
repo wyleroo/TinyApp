@@ -2,14 +2,15 @@
 <font size="20" face="impact" color="goldenrod"> Wyatt's TinyApp </font>
 <br>
 <% if (locals.user_id) { %>
-    <br><font size="3" face="impact" color="seagreen"> currently logged in as <%= user_id %></font>
+    <br><font size="3" face="impact" color="seagreen"> currently logged in as <%= user_email %></font>
     <form method="POST" action="/logout">
         <p>
           <button>Logout</button>
         </p>
       </form>
   <% } else { %>
-    <a href='/login'>Log In</a>
+    <font size="3" face="impact" color="seagreen">You are not logged in.</font>
+    <br><a href='/login'>Log In</a>
     <br><a href='/register'>Register</a>
 <% } %>
 
