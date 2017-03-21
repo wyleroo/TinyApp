@@ -55,7 +55,7 @@ function loginReturn(loginEmail) {
       return users[key].id;
     }
   }
-  return "";
+  return null;
 }
 
 // Function to filter URLDatabase for permitted sites
@@ -147,7 +147,7 @@ app.get("/urls/:id", (req, res) => {
   if (permitted[req.params.id]) {
     res.render("urls_show", templateVars);
   } else {
-    res.status(400).send("That shortURL does not yet exist.")
+    res.status(403).send("You are not authorized.")
   }
 });
 
