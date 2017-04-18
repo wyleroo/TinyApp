@@ -1,0 +1,1 @@
+To start server run 'node express_server.js'. Open 'http://localhost:3000/login' to log in and get started.

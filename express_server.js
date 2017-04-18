@@ -4,6 +4,8 @@ const app = express();
 const cookieSession = require('cookie-session');
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
+const DataHelpers = require("./dataHelpers.js")
+
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession( {
@@ -28,47 +30,6 @@ var users = {
   }
 };
 
-// Function to verify email
-function emailSearch(emailIn) {
-  for (id in users) {
-    if (users[id].email == emailIn){
-      return true;
-    }
-  }
-  return false;
-}
-
-// Function to return user id based on email match
-function loginReturn(loginEmail) {
-  for (key in users) {
-    if (users[key].email == loginEmail){
-      return users[key].id;
-    }
-  }
-  return null;
-}
-
-// Function to filter URLDatabase for permitted sites
-function urlsForUser(idRequest) {
-  let urlUser = {};
-  for (key in urlDatabase) {
-    if (urlDatabase[key].userPermission == idRequest) {
-      urlUser[key] = urlDatabase[key].site;
-    }
-  }
-  return urlUser;
-}
-
-// Random string generator - to be set as randomShorty
-function generateRandomString() {
-  var output = '';
-  chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  for (var i = 0; i < 6; i++) {
-    output += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return output;
-}
-
 //Login page
 app.get("/login", (req, res) => {
   if (req.session.cookie) {
@@ -80,7 +41,7 @@ app.get("/login", (req, res) => {
 //Login handler
 app.post("/login", (req, res) => {
   let typedWord = req.body.password;
-  const user = users[loginReturn(req.body.email)];
+  const user = users[DataHelpers.loginReturn(req.body.email)];
   let userHash = user ? user.password : '';
   if (!req.body.email || !req.body.password) {
     res.status(403).send("Neg. Has to be valid email and password.");
@@ -103,8 +64,8 @@ app.get("/register", (req, res) => {
 
 // Registration handler
 app.post("/register", (req, res) => {
-  let randomID = generateRandomString();
-  if (!req.body.email || !req.body.password || emailSearch(req.body.email)) {
+  let randomID = DataHelpers.generateRandomString();
+  if (!req.body.email || !req.body.password || DataHelpers.emailSearch(req.body.email)) {
     res.status(400).send("Must register with an unused email. Need to fill out both fields.");
   } else {
     let hashWord = bcrypt.hashSync(req.body.password, 10);
@@ -130,7 +91,7 @@ app.get("/urls/new", (req, res) => {
 
 // URLs index page
 app.get("/urls", (req, res) => {
-  let permitted = urlsForUser(req.session.user_id);
+  let permitted = DataHelpers.urlsForUser(req.session.user_id);
   let templateVars = {urls: permitted,
     user_id: req.session.user_id,
     user_email: req.session.user_email
